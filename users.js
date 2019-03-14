@@ -1,9 +1,6 @@
-/** @module api */
+/** @module users */
 
 const express = require('express');
-const users = require('./users');
-const products = require('./products');
-const cart = require('./cart');
 
 const router = express.Router();
 
@@ -17,13 +14,9 @@ function catchErrors(fn) {
   return (req, res, next) => fn(req, res, next).catch(next);
 }
 
-router.use('/users', users);
-router.use('/products', products);
-router.use('/cart', cart);
-
 router.get('/', (req, res) => {
   res.json({
-    site: "main site"
+    site: "user site"
   });
 });
 
