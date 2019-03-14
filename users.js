@@ -1,6 +1,7 @@
 /** @module users */
 
 const express = require('express');
+const { get } = require('./usersTodos');
 
 const router = express.Router();
 
@@ -14,10 +15,19 @@ function catchErrors(fn) {
   return (req, res, next) => fn(req, res, next).catch(next);
 }
 
-router.get('/', (req, res) => {
-  res.json({
-    site: "user site"
-  });
-});
+async function users(req, res) {
+  const result = await get();
+  return res.json(result.rows);
+}
+
+async function getUser(req, res) {
+  const { id } = req.params;
+  const result = await get(id);
+  return res.json(result.rows);
+}
+
+router.get('/', users);
+
+router.get('/:id', getUser);
 
 module.exports = router;
