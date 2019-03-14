@@ -23,10 +23,10 @@ function isEmpty(s) {
  */
 async function validate({ username, email, password } = {}, patching = false) {
   const errors = [];
-  const isNameAvailable = await findByUsername(username);
+  const isNameTaken = await findByUsername(username);
   const isEmailAvailable = await findByEmail(email);
 
-  if (!isNameAvailable) {
+  if (isNameTaken) {
     errors.push({
       title: 'username',
       message: 'Notendanafnið er núþegar til, veldu annað'
@@ -36,7 +36,7 @@ async function validate({ username, email, password } = {}, patching = false) {
   if (!isEmailAvailable) {
     errors.push({
       title: 'email',
-      message: 'Netfang er núþegar til, veldu annað'
+      message: 'Netfang er núþegar í notkun, veldu annað'
     });
   }
 
@@ -64,13 +64,28 @@ async function validate({ username, email, password } = {}, patching = false) {
   return errors;
 }
 
-async function findByUsername(name) {
+async function findByUsername(username) {
   const q = 'SELECT * FROM users WHERE username = $1';
-  const result = await query(q, [name]);
+
+  const result = await query(q, [username]);
+
   if (result.rowCount === 1) {
-    return false;
+    return result.rows[0];
   }
-  return true;
+
+  return null;
+}
+
+async function findById(id) {
+  const q = 'SELECT * FROM users WHERE id = $1';
+
+  const result = await query(q, [id]);
+
+  if (result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
 }
 
 async function findByEmail(email) {
@@ -82,15 +97,16 @@ async function findByEmail(email) {
   return true;
 }
 
-async function get(id) {
-  if (id) {
-    const q = `SELECT * FROM users WHERE id = ${id}`;
-    const result = await query(q);
-    return result;
-  }
+async function comparePasswords(hash, password) {
+  const result = await bcrypt.compare(hash, password);
+
+  return result;
+}
+
+async function getUsers() {
   const q = 'SELECT * FROM users';
   const result = await query(q);
-  return result;
+  return result.rows;
 }
 
 async function create(data) {
@@ -107,6 +123,9 @@ async function create(data) {
 }
 
 module.exports = {
-  get,
-  create
+  findById,
+  findByUsername,
+  create,
+  getUsers,
+  comparePasswords,
 };
