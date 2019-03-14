@@ -1,7 +1,7 @@
 /** @module api */
 
 const express = require('express');
-const users = require('./users');
+const users = require('./users/users');
 const products = require('./products');
 const cart = require('./cart');
 
@@ -23,7 +23,7 @@ router.use('/cart', cart);
 
 router.get('/', (req, res) => {
   res.json({
-    site: "main site"
+    site: 'main site'
   });
 });
 

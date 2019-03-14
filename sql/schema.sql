@@ -21,7 +21,7 @@ CREATE TABLE products
   CREATE TABLE users
   (
     id serial,
-    username varchar(128) unique not null primary key,
+    username varchar(64) unique not null primary key,
     email varchar(64) unique not null,
     password varchar(256) not null,
     admin BOOLEAN DEFAULT false
