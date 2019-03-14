@@ -1,24 +1,14 @@
-INSERT INTO todos
-(title, position, completed)
+INSERT INTO users
+    (username, email, password, admin)
 VALUES
-('Skrá í vefforritun 2', 1, true);
+    ('flóki', 'floki@floki.is', 'neinei', true);
 
-INSERT INTO todos
-(title, position)
+INSERT INTO users
+    (username, email, password, admin)
 VALUES
-('Sækja verkefni 4 á github', 2);
+    ('egill', 'floki2@floki.is', 'neinei', true);
 
-INSERT INTO todos
-(title, position)
+INSERT INTO users
+    (username, email, password, admin)
 VALUES
-('Klára verkefni 4', 3);
-
-INSERT INTO todos
-(title, position)
-VALUES
-('Setja verkefni 4 upp á Heroku', 4);
-
-INSERT INTO todos
-(title, position, due)
-VALUES
-('Skila verkefni 4', 5, '2019-03-08 23:59:59');
+    ('ásdís', 'flok3@floki.is', 'neinei', true);

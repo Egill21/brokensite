@@ -1,7 +1,7 @@
 /** @module users */
 
 const express = require('express');
-const { get } = require('./usersTodos');
+const { get } = require('./usersUtils');
 
 const router = express.Router();
 
