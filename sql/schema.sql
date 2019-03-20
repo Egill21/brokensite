@@ -8,14 +8,12 @@ CREATE TABLE products
 (
   id serial,
   title varchar(128) unique not null primary key,
-  price int not null,
-  descr varchar(256) not null,
+  price varchar(32) not null,
+  descr varchar(1456) not null,
   img varchar(128),
   created timestamp
   with time zone not null default current_timestamp,
-  FOREIGN KEY
-  (title) REFERENCES categories
-  (title) 
+  category varchar(128) not null
 );
 
   CREATE TABLE users
