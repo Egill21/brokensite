@@ -67,6 +67,33 @@ function requireAuth(req, res, next) {
   )(req, res, next);
 }
 
+function requireAdminAuth(req, res, next) {
+  return passport.authenticate(
+    'jwt',
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        const error = info && info.name === 'TokenExpiredError' ?
+          'expired token' : 'invalid token';
+
+        return res.status(401).json({ error });
+      }
+
+      if (!user.admin) {
+        const error = 'invalid token';
+        return res.status(401).json({ error });
+      }
+
+      req.user = user;
+      return next();
+    },
+  )(req, res, next);
+}
+
 async function registerRoute(req, res) {
   const { username, password, email } = req.body;
 
@@ -120,3 +147,4 @@ app.post('/users/login', catchErrors(loginRoute));
 
 module.exports = app;
 module.exports.requireAuth = requireAuth;
+module.exports.requireAdminAuth = requireAdminAuth;

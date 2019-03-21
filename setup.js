@@ -8,6 +8,7 @@ const { query } = require('./db');
 const { uploadImage } = require('./cloud');
 
 const connectionString = process.env.DATABASE_URL;
+const numOfCategories = 12;
 
 const readFileAsync = util.promisify(fs.readFile);
 
@@ -40,16 +41,59 @@ async function main() {
   try {
     const insert = await readFileAsync('./sql/insert.sql');
     await query(insert.toString('utf8'));
+    await insertCategories();
+    console.info('Gögnum bætt við í flokkstöflu');
+    // await testProducts();
     await insertProducts();
+    console.info('Gögnum bætt við í vörutöflu');
     console.info('Gögnum bætt við');
   } catch (e) {
     console.error('Villa við að bæta gögnum við:', e.message);
   }
 }
 
+async function insertCategories() {
+  let title = '';
+  for (let i = 0; i < numOfCategories; i++) {
+    let result = { rowCount: 1 };
+    while (result.rowCount > 0) {
+      title = faker.commerce.department();
+      const q1 = `
+        SELECT * FROM
+        categories
+        WHERE title = $1
+      `;
+      result = await query(q1, [title]);
+    }
+    const q2 = `
+      INSERT INTO
+      categories (title)
+      VALUES ($1)
+    `;
+    await query(q2, [title]);
+  }
+}
+
+async function testProducts() {
+  
+  const title = faker.commerce.productName();
+  const price = faker.commerce.price();
+  const descr = faker.lorem.paragraphs();
+  const imgPath = './img/img1.jpg';
+  const cloudPath = await uploadImage(imgPath);
+  const category = faker.commerce.department();
+
+  const q2 = `
+  INSERT INTO 
+  products (title, price, descr, img, category)
+  VALUES ($1, $2, $3, $4, $5)
+`;
+
+await query(q2, [title, price, descr, cloudPath, category]);
+
+}
+
 async function insertProducts() {
-  // insert title, price, desc, (img?), category
-  Math.floor(Math.random() * 10);
 
   let title = '';
   for (let i = 0; i < 100; i++) {
@@ -64,26 +108,27 @@ async function insertProducts() {
       result = await query(q1, [title]);
     }
 
-    // console.log(title);
     const price = faker.commerce.price();
-    // console.log(price);
     const descr = faker.lorem.paragraphs();
-    // console.log(descr);
-    const category = faker.commerce.department();
-    // console.log(category);
     const imgID = Math.floor(Math.random() * 20) + 1;
     const imgPath = './img/img' + String(imgID) + '.jpg';
     const cloudPath = await uploadImage(imgPath);
+
+    const randomCategory = Math.floor(Math.random() * numOfCategories) + 1;
+    const q2 = 'SELECT title FROM categories WHERE id = $1';
+    const categoryResult = await query(q2, [randomCategory]);
+    const category = categoryResult.rows[0].title;
   
-    const q2 = `
+    const q3 = `
       INSERT INTO 
       products (title, price, descr, img, category)
       VALUES ($1, $2, $3, $4, $5)
     `;
   
-    await query(q2, [title, price, descr, cloudPath, category]);
+    await query(q3, [title, price, descr, cloudPath, category]);
   }
 }
+
 
 main().catch(err => {
   console.error(err);

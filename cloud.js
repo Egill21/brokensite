@@ -20,13 +20,15 @@ cloudinary.config({
 async function uploadImage(path) {
     let upload = null;
     try {
-        upload = await cloudinary.v2.uploader.upload(path);
+        upload = await cloudinary.v2.uploader.upload(path, allowed_formats = ['jpg', 'png', 'gif']);
     } catch (error) {
         if (error.http_code && error.http_code === 400) {
+            console.error(error);
             return { error: error.message };
         }
         console.error('Unable to upload file to cloudinary:', path);
-        return next(error);
+        console.error(error);
+        return { error: 'blabla' };
     }
     return upload.secure_url;
 }

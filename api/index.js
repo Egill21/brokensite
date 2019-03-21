@@ -1,5 +1,5 @@
 const express = require('express');
-const { requireAuth } = require('../auth');
+const { requireAuth, requireAdminAuth } = require('../auth');
 
 const router = express.Router();
 
@@ -13,6 +13,14 @@ const {
 
 const {
   productsRoute,
+  productRoute,
+  productPatchRoute,
+  productDeleteRoute,
+  newProductRoute,
+  categoriesRoute,
+  categoriesPostRoute,
+  categoryPatchRoute,
+  categoryDeleteRoute,
 } = require('./products/products');
 
 function catchErrors(fn) {
@@ -46,24 +54,21 @@ function indexRoute(req, res) {
 }
 
 router.get('/', indexRoute);
-router.get('/users', requireAuth, catchErrors(usersRoute));
-router.patch('/users/:id', requireAuth, catchErrors(updateAdminRoute));
+
+router.get('/users', requireAdminAuth, catchErrors(usersRoute));
+router.get('/users/:id', requireAdminAuth, catchErrors(userRoute));
+router.patch('/users/:id', requireAdminAuth, catchErrors(updateAdminRoute));
 router.get('/users/me', requireAuth, catchErrors(meRoute));
-router.get('/users/:id', requireAuth, catchErrors(userRoute));
 router.patch('/users/me', requireAuth, catchErrors(mePatchRoute));
 
 router.get('/products', catchErrors(productsRoute));
-
-// router.post('/users/me/profile', requireAuth, catchErrors(meProfileRouteWithMulter));
-// router.get('/categories', catchErrors(categoriesRoute));
-// router.post('/categories', requireAuth, catchErrors(categoriesPostRoute));
-// router.get('/books', catchErrors(booksRoute));
-// router.post('/books', requireAuth, catchErrors(booksPostRoute));
-// router.get('/books/:id', catchErrors(bookRoute));
-// router.patch('/books/:id', requireAuth, catchErrors(bookPatchRoute));
-// router.get('/users/me/read', requireAuth, catchErrors(meReadRoute));
-// router.get('/users/:id/read', requireAuth, catchErrors(userReadRoute));
-// router.post('/users/me/read', requireAuth, catchErrors(meReadPostRoute));
-// router.delete('/users/me/read/:id', requireAuth, catchErrors(meReadDeleteRoute));
+router.post('/products',  requireAdminAuth, catchErrors(newProductRoute));
+router.get('/products/:id', catchErrors(productRoute));
+router.patch('/products/:id', requireAdminAuth, catchErrors(productPatchRoute));
+router.delete('/products/:id', requireAdminAuth, catchErrors(productDeleteRoute));
+router.get('/categories', catchErrors(categoriesRoute));
+router.post('/categories', requireAdminAuth, catchErrors(categoriesPostRoute));
+router.patch('/categories/:id', requireAdminAuth, catchErrors(categoryPatchRoute));
+router.delete('/categories/:id', requireAdminAuth, catchErrors(categoryDeleteRoute));
 
 module.exports = router;

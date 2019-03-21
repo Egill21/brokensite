@@ -36,6 +36,17 @@ async function findById(id) {
   return null;
 }
 
+async function findByEmail(email) {
+  const q = 'SELECT * FROM users WHERE email = $1';
+  const result = await query(q, [xss(email)]);
+
+  if (result.rowCount === 1) {
+    return result.rows[0];
+  }
+
+  return null;
+}
+
 async function createUser(username, password, email) {
   const hashedPassword = await bcrypt.hash(password, 11);
 
@@ -104,6 +115,7 @@ module.exports = {
   comparePasswords,
   findByUsername,
   findById,
+  findByEmail,
   createUser,
   updateUser,
   updateAdmin,
