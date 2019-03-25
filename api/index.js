@@ -4,12 +4,12 @@ const { requireAuth, requireAdminAuth } = require('../auth');
 const router = express.Router();
 
 const {
-    usersRoute,
-    userRoute,
-    updateAdminRoute,
-    meRoute,
-    mePatchRoute,
-  } = require('./users');
+  usersRoute,
+  userRoute,
+  updateAdminRoute,
+  meRoute,
+  mePatchRoute
+} = require('./users');
 
 const {
   productsRoute,
@@ -20,8 +20,10 @@ const {
   categoriesRoute,
   categoriesPostRoute,
   categoryPatchRoute,
-  categoryDeleteRoute,
+  categoryDeleteRoute
 } = require('./products/products');
+
+const { cartPostRoute, cartRoute } = require('./cart/cart');
 
 function catchErrors(fn) {
   return (req, res, next) => fn(req, res, next).catch(next);
@@ -34,7 +36,7 @@ function indexRoute(req, res) {
       user: '/users/{id}',
       register: '/users/register',
       login: '/users/login',
-      me: '/users/me',
+      me: '/users/me'
     },
     products: {
       products: '/products',
@@ -42,33 +44,48 @@ function indexRoute(req, res) {
       productsSearch: '/products?search={query}',
       product: '/products/{id}',
       categories: '/categories',
-      category: '/categories/{id}',
+      category: '/categories/{id}'
     },
     cart: {
       cart: '/cart',
       line: '/cart/line/{id}',
       orders: '/orders',
-      order: '/orders/{id}',
-    },
+      order: '/orders/{id}'
+    }
   });
 }
 
 router.get('/', indexRoute);
 
 router.get('/users', requireAdminAuth, catchErrors(usersRoute));
-router.get('/users/:id', requireAdminAuth, catchErrors(userRoute));
-router.patch('/users/:id', requireAdminAuth, catchErrors(updateAdminRoute));
 router.get('/users/me', requireAuth, catchErrors(meRoute));
 router.patch('/users/me', requireAuth, catchErrors(mePatchRoute));
+router.get('/users/:id', requireAdminAuth, catchErrors(userRoute));
+router.patch('/users/:id', requireAdminAuth, catchErrors(updateAdminRoute));
 
 router.get('/products', catchErrors(productsRoute));
-router.post('/products',  requireAdminAuth, catchErrors(newProductRoute));
+router.post('/products', requireAdminAuth, catchErrors(newProductRoute));
 router.get('/products/:id', catchErrors(productRoute));
 router.patch('/products/:id', requireAdminAuth, catchErrors(productPatchRoute));
-router.delete('/products/:id', requireAdminAuth, catchErrors(productDeleteRoute));
+router.delete(
+  '/products/:id',
+  requireAdminAuth,
+  catchErrors(productDeleteRoute)
+);
 router.get('/categories', catchErrors(categoriesRoute));
 router.post('/categories', requireAdminAuth, catchErrors(categoriesPostRoute));
-router.patch('/categories/:id', requireAdminAuth, catchErrors(categoryPatchRoute));
-router.delete('/categories/:id', requireAdminAuth, catchErrors(categoryDeleteRoute));
+router.patch(
+  '/categories/:id',
+  requireAdminAuth,
+  catchErrors(categoryPatchRoute)
+);
+router.delete(
+  '/categories/:id',
+  requireAdminAuth,
+  catchErrors(categoryDeleteRoute)
+);
+
+router.post('/cart', requireAuth, catchErrors(cartPostRoute));
+router.get('/cart', requireAuth, catchErrors(cartRoute));
 
 module.exports = router;
