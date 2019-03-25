@@ -1,14 +1,9 @@
 INSERT INTO users
     (username, email, password, admin)
 VALUES
-    ('flóki', 'floki@floki.is', 'neinei', true);
+    ('admin', 'floki@floki.is', '$2b$11$a5au66dLEqo9Gjpa61BIfuGBQpX8U.mKo6e4Lvy3/HmQj/mpEVuke', true);
 
 INSERT INTO users
     (username, email, password, admin)
 VALUES
-    ('egill', 'floki2@floki.is', 'neinei', true);
-
-INSERT INTO users
-    (username, email, password, admin)
-VALUES
-    ('ásdís', 'flok3@floki.is', 'neinei', true);
+    ('user', 'floki2@floki.is', '$2b$11$a5au66dLEqo9Gjpa61BIfuGBQpX8U.mKo6e4Lvy3/HmQj/mpEVuke', false);

@@ -6,8 +6,8 @@ CREATE TABLE categories
 
 CREATE TABLE products
 (
-  id serial,
-  title varchar(128) unique not null primary key,
+  id serial primary key,
+  title varchar(128) unique not null,
   price varchar(32) not null,
   descr varchar(1500) not null,
   img varchar(640),
@@ -22,8 +22,8 @@ CREATE TABLE products
 
 CREATE TABLE users
 (
-  id serial,
-  username varchar(64) unique not null primary key,
+  id serial primary key,
+  username varchar(64) unique not null,
   email varchar(64) unique not null,
   password varchar(256) not null,
   admin BOOLEAN DEFAULT false
@@ -34,7 +34,7 @@ CREATE TABLE carts
   id serial primary key,
   userid int not null,
   FOREIGN KEY (userid) REFERENCES users(id),
-  order bit unique,
+  isorder bit unique,
   name varchar
   (128),
   address varchar
