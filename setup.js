@@ -15,16 +15,12 @@ const readFileAsync = util.promisify(fs.readFile);
 async function main() {
   console.info(`Set upp gagnagrunn á ${connectionString}`);
   // droppa töflu ef til
-  await query('DROP TABLE IF EXISTS inorder');
-  await query('DROP TABLE IF EXISTS orders');
+  await query('DROP TABLE IF EXISTS incart');
+  await query('DROP TABLE IF EXISTS carts');
   await query('DROP TABLE IF EXISTS products');
-  console.info('Products eytt');
-  await query('DROP TABLE IF EXISTS users');
-  console.info('Categories eytt');
   await query('DROP TABLE IF EXISTS categories');
-  console.info('Users eytt');
-  console.info('Orders eytt');
-  console.info('Inorder eytt');
+  await query('DROP TABLE IF EXISTS users');
+  console.info('Töflum eytt');
 
   // búa til töflur út frá skema
   try {
@@ -43,10 +39,9 @@ async function main() {
     await query(insert.toString('utf8'));
     await insertCategories();
     console.info('Gögnum bætt við í flokkstöflu');
-    // await testProducts();
+    await testProducts();
     await insertProducts();
     console.info('Gögnum bætt við í vörutöflu');
-    console.info('Gögnum bætt við');
   } catch (e) {
     console.error('Villa við að bæta gögnum við:', e.message);
   }
