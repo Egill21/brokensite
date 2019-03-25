@@ -23,15 +23,23 @@ async function getCart(userId) {
   const result2 = await query(q2, [cartId]);
   const products = result2.rows;
   let price = [];
+  let pros = [];
   for (let i = 0; i < products.length; i++) {
     const amount = products[i].amount;
     const productid = products[i].productid;
     price.push(await getPrice(productid, amount));
+    let temp = await getProductById(productid);
+    pros.push({
+      id: products[i].id,
+      product: temp.title,
+      amount: amount
+    });
   }
   const fullPrice = calculatePrice(price);
-  products.fullprice = fullPrice;
 
-  return products;
+  pros.push({ fullprice: fullPrice });
+
+  return pros;
 }
 
 // Reiknar út summu fylkja
@@ -69,6 +77,51 @@ async function addToCart(userid, productid, amount) {
   return cart.rows[0];
 }
 
+async function changeAmount(userid, id, amount) {
+  const check = `
+        SELECT * FROM
+        carts 
+        WHERE userid = $1 AND 
+        isorder = '0'`;
+  const result = await query(check, [userid]);
+  const cartid = result.rows[0].id;
+  console.log(result.rows[0].id);
+  const q = `
+        UPDATE incart
+        SET amount = $1
+        WHERE id = $2 AND cartid = $3
+        RETURNING *
+  `;
+  const result2 = await query(q, [amount, id, cartid]);
+  const product = await getProductById(result2.rows[0].productid);
+  const boi = {
+    product: product.title,
+    amount: result2.rows[0].amount
+  };
+  return boi;
+}
+
+async function deleteCartItem(userid, id) {
+  const check = `
+    SELECT * FROM
+    carts 
+    WHERE userid = $1 AND 
+    isorder = '0'`;
+  const result = await query(check, [userid]);
+  const cartid = result.rows[0].id;
+  const q = `
+  DELETE FROM incart
+  WHERE 
+  id = $1
+  AND
+  cartid = $2
+  `;
+  const boi = await query(q, [id, cartid]);
+
+  const cart = getCart(userid);
+  return cart;
+}
+
 async function createCart(userId) {
   const q = 'INSERT INTO carts(userid) VALUES($1)';
   await query(q, [userId]);
@@ -76,5 +129,7 @@ async function createCart(userId) {
 
 module.exports = {
   getCart,
-  addToCart
+  addToCart,
+  changeAmount,
+  deleteCartItem
 };

@@ -186,10 +186,23 @@ async function validateCartPost(productId, amount) {
   return validationMessages;
 }
 
+async function validateCartPatch(amount) {
+  const validationMessages = [];
+
+  if (isEmpty(amount) || typeof amount !== 'number') {
+    validationMessages.push({
+      field: 'amount',
+      message: 'Amount be a number greater than 0'
+    });
+  }
+  return validationMessages;
+}
+
 module.exports = {
   validateUser,
   validateAdmin,
   validateProduct,
   validateCategory,
-  validateCartPost
+  validateCartPost,
+  validateCartPatch
 };
