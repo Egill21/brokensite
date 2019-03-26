@@ -44,7 +44,7 @@ async function getCartLine(userid, lineid) {
 
   if (!temp.available) {
     return {
-      message: temp.error
+      error: temp.error
     };
   }
 
