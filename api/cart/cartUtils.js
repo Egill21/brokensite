@@ -218,6 +218,50 @@ async function deleteCartIfEmpty(userid, cartId) {
   return false;
 }
 
+async function getOrdersUser(userId, offset) {
+  const q = `
+    SELECT *
+    FROM carts
+    WHERE userid = $1
+    AND isorder = '1'
+    `;
+  const values = [userId];
+  const result = await paged(q, { offset, values });
+
+  return result;
+}
+
+async function getOrdersAdmin() {
+  const q = `
+    SELECT *
+    FROM carts
+    AND isorder = "1"
+    `;
+
+  const result = await query(q, [userId]);
+
+  if (result.rows.length === 0) {
+    return {
+      error: 'engar pantanir bish'
+    };
+  }
+
+  return result.rows;
+}
+
+async function getOrders(userId, isAdmin, offset) {
+
+  let orders;
+
+  if (isAdmin) {
+    orders = await getOrdersAdmin(offset);
+  } else {
+    orders = await getOrdersUser(userId, offset);
+  }
+
+  return orders;
+}
+
 async function makeOrder(bit, id) {
   const cart = await getCart(id);
   const notbit = '0';
@@ -244,6 +288,7 @@ module.exports = {
   addToCart,
   changeAmount,
   deleteCartItem,
+  getOrders,
   makeOrder,
-  getCartLine
+  getCartLine,
 };
