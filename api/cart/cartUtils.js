@@ -8,7 +8,7 @@ async function getCart(userId) {
 
   if (!temp.available) {
     return {
-      message: temp.error
+      error: temp.error
     };
   }
   const cartId = temp.id;
@@ -44,7 +44,7 @@ async function getCartLine(userid, lineid) {
 
   if (!temp.available) {
     return {
-      message: temp.error
+      error: temp.error
     };
   }
 

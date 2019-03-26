@@ -6,7 +6,11 @@ const {
   getCartLine
 } = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
-const { validateCartPost, validateCartPatch } = require('../../validation');
+const {
+  validateCartPost,
+  validateCartPatch,
+  validateId
+} = require('../../validation');
 
 async function cartRoute(req, res) {
   const { id } = req.user;
@@ -33,8 +37,17 @@ async function cartPostRoute(req, res) {
 async function cartLineRoute(req, res) {
   const userid = req.user.id;
   const { id } = req.params;
-  const result = await getCartLine(userid, id);
 
+  const validationMessage = await validateId(id);
+
+  if (validationMessage.length > 0) {
+    return res.status(400).json({ errors: validationMessage });
+  }
+  const result = await getCartLine(userid, id);
+  console.log(result);
+  if (result.error) {
+    return res.status(404).json({ errors: result.error });
+  }
   return res.json(result);
 }
 
@@ -49,15 +62,26 @@ async function cartChange(req, res) {
     return res.status(400).json({ errors: validationMessage });
   }
   const items = await changeAmount(userid, id, amount);
-  return res.json(items);
+  if (items.error) {
+    return res.status(404).json(items);
+  }
+  return res.status(200).json(items);
 }
 
 async function cartItemDelete(req, res) {
   const userid = req.user.id;
   const { id } = req.params;
+  const validationMessage = await validateId(id);
+
+  if (validationMessage.length > 0) {
+    return res.status(400).json({ errors: validationMessage });
+  }
   const result = await deleteCartItem(userid, id);
 
-  return res.json(result);
+  if (result.error) {
+    return res.status(404).json(result);
+  }
+  return res.status(200).json(result);
 }
 
 module.exports = {

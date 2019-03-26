@@ -198,11 +198,24 @@ async function validateCartPatch(amount) {
   return validationMessages;
 }
 
+async function validateId(id) {
+  const validationMessages = [];
+
+  if (!Number.isInteger(Number(id))) {
+    validationMessages.push({
+      field: 'id',
+      message: 'ID must be a number greater than or equal to 0'
+    });
+  }
+  return validationMessages;
+}
+
 module.exports = {
   validateUser,
   validateAdmin,
   validateProduct,
   validateCategory,
   validateCartPost,
-  validateCartPatch
+  validateCartPatch,
+  validateId
 };
