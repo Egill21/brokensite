@@ -2,7 +2,8 @@ const {
   addToCart,
   getCart,
   changeAmount,
-  deleteCartItem
+  deleteCartItem,
+  getOrders,
 } = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
 const { validateCartPost, validateCartPatch } = require('../../validation');
@@ -51,9 +52,27 @@ async function cartItemDelete(req, res) {
   return res.json(result);
 }
 
+async function ordersRoute(req, res) {
+  const { id } = req.user;
+  const orders = await getOrders(id);
+  return res.json(orders);
+}
+
+async function ordersPostRoute(req, res) {
+  const { productId, amount } = req.body;
+  const { id } = req.user;
+
+  const items = await addToCart(id, productId, amount);
+  const product = await getProductById(productId);
+  items.product = product;
+  return res.json(items);
+}
+
 module.exports = {
   cartRoute,
   cartPostRoute,
   cartChange,
-  cartItemDelete
+  cartItemDelete,
+  ordersRoute,
+  ordersPostRoute
 };

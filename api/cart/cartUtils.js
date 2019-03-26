@@ -174,9 +174,31 @@ async function deleteCartIfEmpty(userid, cartId) {
   return false;
 }
 
+async function getOrders(userId) {
+  const values = [];
+  let q = `
+    SELECT *
+    FROM carts
+    WHERE userid = $1
+    AND isorder = "1"
+    `;
+
+  const result = await query(q, [userId]);
+
+  if (result.rows.length === 0) {
+    return {
+      error: 'engar pantanir bish'
+    };
+  }
+
+  return result.rows;
+}
+
 module.exports = {
   getCart,
   addToCart,
   changeAmount,
-  deleteCartItem
+  deleteCartItem,
+  getOrders,
+  getOrders
 };
