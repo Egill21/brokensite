@@ -1,6 +1,11 @@
-const { addToCart, getCart } = require('./cartUtils');
+const {
+  addToCart,
+  getCart,
+  changeAmount,
+  deleteCartItem
+} = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
-const { validateCartPost } = require('../../validation');
+const { validateCartPost, validateCartPatch } = require('../../validation');
 
 async function cartRoute(req, res) {
   const { id } = req.user;
@@ -24,7 +29,31 @@ async function cartPostRoute(req, res) {
   return res.json(items);
 }
 
+async function cartChange(req, res) {
+  const userid = req.user.id;
+  const { id } = req.params;
+  const { amount } = req.body;
+
+  const validationMessage = await validateCartPatch(amount);
+
+  if (validationMessage.length > 0) {
+    return res.status(400).json({ errors: validationMessage });
+  }
+  const items = await changeAmount(userid, id, amount);
+  return res.json(items);
+}
+
+async function cartItemDelete(req, res) {
+  const userid = req.user.id;
+  const { id } = req.params;
+  const result = await deleteCartItem(userid, id);
+
+  return res.json(result);
+}
+
 module.exports = {
   cartRoute,
-  cartPostRoute
+  cartPostRoute,
+  cartChange,
+  cartItemDelete
 };
