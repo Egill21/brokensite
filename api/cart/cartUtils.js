@@ -8,7 +8,7 @@ async function getCart(userId) {
 
   if (!temp.available) {
     return {
-      message: temp.error
+      error: temp.error
     };
   }
   const cartId = temp.id;
@@ -218,10 +218,32 @@ async function deleteCartIfEmpty(userid, cartId) {
   return false;
 }
 
+async function makeOrder(bit, id) {
+  const cart = await getCart(id);
+  const notbit = '0';
+  if (cart.error) {
+    return null;
+  }
+  const currentDate = new Date();
+  const q = `
+    UPDATE carts
+    SET isorder = $1
+    ,created = $2
+    WHERE isorder = $3
+    AND userid = $4
+    RETURNING *
+  `;
+  const values = [bit, currentDate, notbit, id];
+
+  const result = await query(q, values);
+  return cart;
+}
+
 module.exports = {
   getCart,
   addToCart,
   changeAmount,
   deleteCartItem,
+  makeOrder,
   getCartLine
 };
