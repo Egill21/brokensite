@@ -63,16 +63,11 @@ async function cartItemDelete(req, res) {
 }
 
 async function ordersRoute(req, res) {
-  const { id } = req.user;
-  const { user } = req;
+  const { id, admin } = req.user;
+  const { offset = 0 } = req.query;
 
-  /*   if (user.admin) {
-      
-    } */
-
-  const orders = await getOrders(id, user);
+  const orders = await getOrders(id, admin, offset);
   return res.json(orders);
-
 }
 
 async function ordersPostRoute(req, res) {

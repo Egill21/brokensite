@@ -218,12 +218,23 @@ async function deleteCartIfEmpty(userid, cartId) {
   return false;
 }
 
-async function getOrders(userId) {
-  const values = [];
-  let q = `
+async function getOrdersUser(userId, offset) {
+  const q = `
     SELECT *
     FROM carts
     WHERE userid = $1
+    AND isorder = '1'
+    `;
+  const values = [userId];
+  const result = await paged(q, { offset, values });
+
+  return result;
+}
+
+async function getOrdersAdmin() {
+  const q = `
+    SELECT *
+    FROM carts
     AND isorder = "1"
     `;
 
@@ -236,6 +247,19 @@ async function getOrders(userId) {
   }
 
   return result.rows;
+}
+
+async function getOrders(userId, isAdmin, offset) {
+
+  let orders;
+
+  if (isAdmin) {
+    orders = await getOrdersAdmin(offset);
+  } else {
+    orders = await getOrdersUser(userId, offset);
+  }
+
+  return orders;
 }
 
 async function makeOrder(bit, id) {
@@ -266,5 +290,5 @@ module.exports = {
   deleteCartItem,
   getOrders,
   makeOrder,
-  getCartLine
+  getCartLine,
 };
