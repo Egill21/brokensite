@@ -4,6 +4,7 @@ const {
   changeAmount,
   deleteCartItem,
   getOrders,
+  makeOrder,
   getCartLine
 } = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
@@ -71,6 +72,31 @@ async function ordersRoute(req, res) {
 
   const orders = await getOrders(id, user);
   return res.json(orders);
+
+}
+
+async function ordersPostRoute(req, res) {
+  const { id } = req.user;
+  const { order } = req.body;
+
+  const changeToOrder = order === true ? '1' : '0';
+
+  if (changeToOrder !== '1') {
+    return res.status(400).json({
+      error: {
+        field: 'order',
+        message: `To create order, order must be equal to 'true'`,
+      }
+    });
+  }
+
+  const result = await makeOrder(changeToOrder, id);
+
+  if (!result) {
+    const message = 'You dont have anything in your cart';
+    return res.status(404).json({ error: message });
+  }
+  return res.json(result);
 }
 
 module.exports = {
@@ -79,5 +105,6 @@ module.exports = {
   cartChange,
   cartItemDelete,
   ordersRoute,
+  ordersPostRoute,
   cartLineRoute
 };
