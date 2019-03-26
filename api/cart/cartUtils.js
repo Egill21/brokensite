@@ -63,6 +63,7 @@ async function addToCart(userid, productid, amount) {
   const result = await query(check, [userid]);
 
   if (result.rows.length === 0) {
+    console.log(result.rows);
     cartid = await createCart(userid);
   } else {
     cartid = result.rows[0].id;
