@@ -17,9 +17,9 @@ async function main() {
   // droppa töflu ef til
   await query('DROP TABLE IF EXISTS incart');
   await query('DROP TABLE IF EXISTS carts');
+  await query('DROP TABLE IF EXISTS users');
   await query('DROP TABLE IF EXISTS products');
   await query('DROP TABLE IF EXISTS categories');
-  await query('DROP TABLE IF EXISTS users');
   console.info('Töflum eytt');
 
   // búa til töflur út frá skema
@@ -39,7 +39,7 @@ async function main() {
     await query(insert.toString('utf8'));
     await insertCategories();
     console.info('Gögnum bætt við í flokkstöflu');
-    await testProducts();
+    //await testProducts();
     await insertProducts();
     console.info('Gögnum bætt við í vörutöflu');
   } catch (e) {
@@ -70,7 +70,6 @@ async function insertCategories() {
 }
 
 async function testProducts() {
-  
   const title = faker.commerce.productName();
   const price = faker.commerce.price();
   const descr = faker.lorem.paragraphs();
@@ -84,15 +83,13 @@ async function testProducts() {
   VALUES ($1, $2, $3, $4, $5)
 `;
 
-await query(q2, [title, price, descr, cloudPath, category]);
-
+  await query(q2, [title, price, descr, cloudPath, category]);
 }
 
 async function insertProducts() {
-
   let title = '';
   for (let i = 0; i < 100; i++) {
-    let result = { rowCount: 1, }
+    let result = { rowCount: 1 };
     while (result.rowCount > 0) {
       title = faker.commerce.productName();
       const q1 = `
@@ -113,17 +110,16 @@ async function insertProducts() {
     const q2 = 'SELECT title FROM categories WHERE id = $1';
     const categoryResult = await query(q2, [randomCategory]);
     const category = categoryResult.rows[0].title;
-  
+
     const q3 = `
       INSERT INTO 
       products (title, price, descr, img, category)
       VALUES ($1, $2, $3, $4, $5)
     `;
-  
+
     await query(q3, [title, price, descr, cloudPath, category]);
   }
 }
-
 
 main().catch(err => {
   console.error(err);
