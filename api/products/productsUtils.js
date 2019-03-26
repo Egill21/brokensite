@@ -90,7 +90,6 @@ async function makeNewProduct(data) {
     xss(image),
     xss(category)
   ]);
-  console.log(result);
 
   return result.rows[0];
 }
@@ -144,7 +143,6 @@ async function getCategory(title) {
 }
 
 async function getCategoryById(id) {
-
   const q = `
         SELECT * FROM
         categories
@@ -200,5 +198,5 @@ module.exports = {
   getCategoryById,
   newCategory,
   categoryInProducts,
-  updateCategory,
+  updateCategory
 };

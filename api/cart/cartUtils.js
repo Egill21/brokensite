@@ -11,8 +11,10 @@ async function getCart(userId) {
     WHERE userid = $1
     `;
   const result = await query(q, [userId]);
-  if (!result.rows) {
-    return null;
+  if (result.rows.length === 0) {
+    return {
+      error: 'You dont have anything in your cart'
+    };
   }
   const cartId = result.rows[0].id;
   const q2 = `
@@ -60,7 +62,6 @@ async function addToCart(userid, productid, amount) {
         isorder = '0'`;
   const result = await query(check, [userid]);
 
-  console.log(userid);
   if (result.rows.length === 0) {
     cartid = await createCart(userid);
   } else {
@@ -84,8 +85,15 @@ async function changeAmount(userid, id, amount) {
         WHERE userid = $1 AND 
         isorder = '0'`;
   const result = await query(check, [userid]);
+
+  if (result.rows.length === 0) {
+    return {
+      error: 'You dont have anything in your cart'
+    };
+  }
+
   const cartid = result.rows[0].id;
-  console.log(result.rows[0].id);
+
   const q = `
         UPDATE incart
         SET amount = $1
@@ -93,6 +101,12 @@ async function changeAmount(userid, id, amount) {
         RETURNING *
   `;
   const result2 = await query(q, [amount, id, cartid]);
+
+  if (result2.rows.length === 0) {
+    return {
+      error: 'There is no product in your cart with that ID'
+    };
+  }
   const product = await getProductById(result2.rows[0].productid);
   const boi = {
     product: product.title,
@@ -108,7 +122,19 @@ async function deleteCartItem(userid, id) {
     WHERE userid = $1 AND 
     isorder = '0'`;
   const result = await query(check, [userid]);
+
+  if (result.rows.length === 0) {
+    return {
+      error: 'You dont have anything in your cart'
+    };
+  }
   const cartid = result.rows[0].id;
+  const canDelete = await deleteCartIfEmpty(userid, cartid);
+  if (!canDelete) {
+    return {
+      error: 'You dont have anything in your cart'
+    };
+  }
   const q = `
   DELETE FROM incart
   WHERE 
@@ -116,15 +142,36 @@ async function deleteCartItem(userid, id) {
   AND
   cartid = $2
   `;
-  const boi = await query(q, [id, cartid]);
+  await query(q, [id, cartid]);
 
-  const cart = getCart(userid);
+  const cart = await getCart(userid);
+
   return cart;
 }
 
 async function createCart(userId) {
-  const q = 'INSERT INTO carts(userid) VALUES($1)';
-  await query(q, [userId]);
+  const q = 'INSERT INTO carts(userid) VALUES($1) RETURNING *';
+  const result = await query(q, [userId]);
+  return result.rows[0].id;
+}
+
+async function deleteCartIfEmpty(userid, cartId) {
+  const q = `
+        SELECT *
+        FROM incart
+        WHERE cartid = $1
+    `;
+  const result = await query(q, [cartId]);
+  if (!(result.rows.length === 0)) {
+    return true;
+  }
+  const deleteQ = `
+        DELETE FROM carts
+        WHERE userid = $1
+    `;
+  await query(deleteQ, [userid]);
+
+  return false;
 }
 
 module.exports = {

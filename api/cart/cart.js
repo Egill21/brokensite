@@ -48,7 +48,7 @@ async function cartItemDelete(req, res) {
   const { id } = req.params;
   const result = await deleteCartItem(userid, id);
 
-  return res.json(result.rows);
+  return res.json(result);
 }
 
 module.exports = {
