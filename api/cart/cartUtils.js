@@ -5,18 +5,10 @@ const xss = require('xss');
 // Nota með cartRoute() í cart.js
 async function getCart(userId) {
   const temp = await isCart(userId);
-  /* let q = `
-    SELECT *
-    FROM carts
-    WHERE userid = $1
-    `;
 
-  const result = await query(q, [userId]);
-  console.log(result); */
-  console.log(temp);
   if (!temp.available) {
     return {
-      error: temp.error
+      message: temp.error
     };
   }
   const cartId = temp.id;
@@ -47,7 +39,43 @@ async function getCart(userId) {
   return pros;
 }
 
-async function getCartLine(userid, lineid) {}
+async function getCartLine(userid, lineid) {
+  const temp = await isCart(userid);
+
+  if (!temp.available) {
+    return {
+      message: temp.error
+    };
+  }
+
+  const newLineId = await getLineId(temp.id, lineid);
+
+  const q = `
+    SELECT *
+    FROM incart
+    WHERE id = $1
+  `;
+
+  const line = await query(q, [newLineId]);
+  const product = await getProductById(line.rows[0].productid);
+  return {
+    amount: line.rows[0].amount,
+    product: product.title
+  };
+}
+
+async function getLineId(cartid, line) {
+  const q = `
+        SELECT *
+        FROM incart
+        WHERE cartid = $1
+    `;
+  const lNums = await query(q, [cartid]);
+
+  const newCartId = lNums.rows[line - 1].id;
+
+  return newCartId;
+}
 
 // Reiknar út summu fylkja
 const calculatePrice = arr => arr.reduce((a, b) => a + b, 0);
@@ -88,18 +116,18 @@ async function changeAmount(userid, id, amount) {
   }
 
   const cartid = temp.id;
-
+  const newLineId = await getLineId(cartid, id);
   const q = `
         UPDATE incart
         SET amount = $1
         WHERE id = $2 AND cartid = $3
         RETURNING *
   `;
-  const result2 = await query(q, [amount, id, cartid]);
+  const result2 = await query(q, [amount, newLineId, cartid]);
 
   if (result2.rows.length === 0) {
     return {
-      error: 'There is no product in your cart with that ID'
+      error: 'There is no product in that line in your cart'
     };
   }
   const product = await getProductById(result2.rows[0].productid);
@@ -124,6 +152,7 @@ async function deleteCartItem(userid, id) {
       error: await getCart(userid)
     };
   }
+  const newLineId = await getLineId(cartid.id, id);
   const q = `
   DELETE FROM incart
   WHERE 
@@ -131,7 +160,7 @@ async function deleteCartItem(userid, id) {
   AND
   cartid = $2
   `;
-  await query(q, [id, cartid.id]);
+  await query(q, [newLineId, cartid.id]);
 
   await deleteCartIfEmpty(userid, cartid.id);
 
@@ -175,7 +204,7 @@ async function deleteCartIfEmpty(userid, cartId) {
         WHERE cartid = $1
     `;
   const result = await query(q, [cartId]);
-  console.log(result);
+
   if (!(result.rows.length === 0)) {
     return true;
   }
@@ -193,5 +222,6 @@ module.exports = {
   getCart,
   addToCart,
   changeAmount,
-  deleteCartItem
+  deleteCartItem,
+  getCartLine
 };
