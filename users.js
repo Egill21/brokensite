@@ -38,7 +38,7 @@ async function findById(id) {
 
 async function findByEmail(email) {
   const q = 'SELECT * FROM users WHERE email = $1';
-  const result = await query(q, [xss(email)]);
+  const result = await query(q, [email]);
 
   if (result.rowCount === 1) {
     return result.rows[0];
