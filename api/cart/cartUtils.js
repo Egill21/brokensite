@@ -244,6 +244,5 @@ module.exports = {
   changeAmount,
   deleteCartItem,
   getOrders,
-  getOrders,
   getCartLine
 };

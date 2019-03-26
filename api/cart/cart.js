@@ -3,11 +3,8 @@ const {
   getCart,
   changeAmount,
   deleteCartItem,
-<<<<<<< HEAD
   getOrders,
-=======
   getCartLine
->>>>>>> ee4e158d0d721855e5d7c4446e1ecd8fa8cb1fb5
 } = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
 const { validateCartPost, validateCartPatch } = require('../../validation');
@@ -66,18 +63,14 @@ async function cartItemDelete(req, res) {
 
 async function ordersRoute(req, res) {
   const { id } = req.user;
-  const orders = await getOrders(id);
+  const { user } = req;
+
+  /*   if (user.admin) {
+      
+    } */
+
+  const orders = await getOrders(id, user);
   return res.json(orders);
-}
-
-async function ordersPostRoute(req, res) {
-  const { productId, amount } = req.body;
-  const { id } = req.user;
-
-  const items = await addToCart(id, productId, amount);
-  const product = await getProductById(productId);
-  items.product = product;
-  return res.json(items);
 }
 
 module.exports = {
@@ -86,6 +79,5 @@ module.exports = {
   cartChange,
   cartItemDelete,
   ordersRoute,
-  ordersPostRoute,
   cartLineRoute
 };

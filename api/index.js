@@ -29,7 +29,6 @@ const {
   cartChange,
   cartItemDelete,
   ordersRoute,
-  ordersPostRoute,
   cartLineRoute
 } = require('./cart/cart');
 
@@ -97,11 +96,7 @@ router.post('/cart', requireAuth, catchErrors(cartPostRoute));
 router.get('/cart', requireAuth, catchErrors(cartRoute));
 router.patch('/cart/line/:id', requireAuth, catchErrors(cartChange));
 router.delete('/cart/line/:id', requireAuth, catchErrors(cartItemDelete));
-<<<<<<< HEAD
 router.get('/orders', requireAuth, catchErrors(ordersRoute));
-router.post('/orders', requireAuth, catchErrors(ordersPostRoute));
-=======
 router.get('/cart/line/:id', requireAuth, catchErrors(cartLineRoute));
->>>>>>> ee4e158d0d721855e5d7c4446e1ecd8fa8cb1fb5
 
 module.exports = router;
