@@ -2,7 +2,8 @@ const {
   addToCart,
   getCart,
   changeAmount,
-  deleteCartItem
+  deleteCartItem,
+  makeOrder,
 } = require('./cartUtils');
 const { getProductById } = require('../products/productsUtils');
 const { validateCartPost, validateCartPatch } = require('../../validation');
@@ -51,9 +52,32 @@ async function cartItemDelete(req, res) {
   return res.json(result);
 }
 
+async function ordersPostRoute(req, res) {
+  const { id } = req.user;
+  const { order } = req.body;
+
+  const changeToOrder = order === true ? '1' : '0'; 
+  
+  if (changeToOrder !== '1') {
+    return res.status(400).json({ error: {
+      field: 'order',
+      message: `To create order, order must be equal to 'true'`,
+    }});
+  }
+
+  const result = await makeOrder(changeToOrder, id);
+
+  if (!result) {
+    const message = 'You dont have anything in your cart';
+    return res.status(404).json({ error: message });
+  }
+  return res.json(result);
+}
+
 module.exports = {
   cartRoute,
   cartPostRoute,
   cartChange,
-  cartItemDelete
+  cartItemDelete,
+  ordersPostRoute,
 };
