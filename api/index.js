@@ -56,10 +56,10 @@ function indexRoute(req, res) {
 router.get('/', indexRoute);
 
 router.get('/users', requireAdminAuth, catchErrors(usersRoute));
-router.get('/users/:id', requireAdminAuth, catchErrors(userRoute));
-router.patch('/users/:id', requireAdminAuth, catchErrors(updateAdminRoute));
 router.get('/users/me', requireAuth, catchErrors(meRoute));
 router.patch('/users/me', requireAuth, catchErrors(mePatchRoute));
+router.get('/users/:id', requireAdminAuth, catchErrors(userRoute));
+router.patch('/users/:id', requireAdminAuth, catchErrors(updateAdminRoute));
 
 router.get('/products', catchErrors(productsRoute));
 router.post('/products',  requireAdminAuth, catchErrors(newProductRoute));
