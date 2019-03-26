@@ -166,64 +166,64 @@ async function categoriesPostRoute(req, res) {
 }
 
 async function categoryPatchRoute(req, res) {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!Number.isInteger(Number(id))) {
-        return res.status(404).json({ error: 'Id entry not found' });
-    }
+  if (!Number.isInteger(Number(id))) {
+    return res.status(404).json({ error: 'Id entry not found' });
+  }
 
-    const category = await getCategoryById(id);
-    if (!category) {
-        return res.status(404).json({ error: 'Category not found' });
-    }
+  const category = await getCategoryById(id);
+  if (!category) {
+    return res.status(404).json({ error: 'Category not found' });
+  }
 
-    const { title } = req.body;
+  const { title } = req.body;
 
-    const validationMessage = validateCategory(title);
-    if (validationMessage.length > 0) {
-        return res.status(400).json({ errors: validationMessage });
-    }
+  const validationMessage = validateCategory(title);
+  if (validationMessage.length > 0) {
+    return res.status(400).json({ errors: validationMessage });
+  }
 
-    const category2 = await getCategory(title);
-    if (category2.length !== 0) {
-        return res.status(404).json({ error: 'Category already exists' });
-    }
+  const category2 = await getCategory(title);
+  if (category2.length !== 0) {
+    return res.status(404).json({ error: 'Category already exists' });
+  }
 
-    const category3 = await categoryInProducts(title);
-    if (category3.length > 0) {
-        return res.status(404).json({ error: 'Category is still in use' });
-    }
+  const category3 = await categoryInProducts(title);
+  if (category3.length > 0) {
+    return res.status(404).json({ error: 'Category is still in use' });
+  }
 
-    const result = await updateCategory(id, title);
-    if (!result) {
-        return res.status(400).json({ error: 'Nothing to patch' });
-    }
-    return res.status(200).json(result);
+  const result = await updateCategory(id, title);
+  if (!result) {
+    return res.status(400).json({ error: 'Nothing to patch' });
+  }
+  return res.status(200).json(result);
 }
 
 async function categoryDeleteRoute(req, res) {
-    const { id } = req.params;
+  const { id } = req.params;
 
-    if (!Number.isInteger(Number(id))) {
-        return res.status(404).json({ error: 'Id entry not found' });
-    }
-
-    const category = await getCategoryById(id);
-    if (!category) {
-        return res.status(404).json({ error: 'Category not found' });
-    }
-    
-    const category2 = await categoryInProducts(category[0].title);
-    if (category2.length > 0) {
-        return res.status(404).json({ error: 'Category is still in use' });
-    }
-
-    const del = await query('DELETE FROM categories WHERE id = $1', [id]);
-    if (del.rowCount === 1) {
-        return res.status(204).json({});
-    }
-
+  if (!Number.isInteger(Number(id))) {
     return res.status(404).json({ error: 'Id entry not found' });
+  }
+
+  const category = await getCategoryById(id);
+  if (!category) {
+    return res.status(404).json({ error: 'Category not found' });
+  }
+
+  const category2 = await categoryInProducts(category[0].title);
+  if (category2.length > 0) {
+    return res.status(404).json({ error: 'Category is still in use' });
+  }
+
+  const del = await query('DELETE FROM categories WHERE id = $1', [id]);
+  if (del.rowCount === 1) {
+    return res.status(204).json({});
+  }
+
+  return res.status(404).json({ error: 'Id entry not found' });
 }
 
 module.exports = {

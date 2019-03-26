@@ -9,14 +9,34 @@ async function getProducts(offset, category, search) {
           ORDER BY created DESC
       `;
 
-  if (category !== undefined) {
+  if (category !== undefined && search !== undefined) {
+    q = `
+        SELECT * FROM
+        products
+        WHERE category = $1
+        AND (title LIKE '%' || ($2) || '%'
+        OR descr LIKE '%' || ($2) || '%')
+        ORDER BY created DESC
+      `;
+    values.push(category);
+    values.push(search);
+  } else if (category !== undefined) {
     q = `
         SELECT * FROM
         products
         WHERE category = $1
         ORDER BY created DESC
       `;
-    values.push(xss(category));
+    values.push(category);
+  } else if (search !== undefined) {
+    q = `
+        SELECT * FROM
+        products
+        WHERE title LIKE '%' || ($1) || '%'
+        OR descr LIKE '%' || ($1) || '%'
+        ORDER BY created DESC
+      `;
+    values.push(search);
   }
 
   const products = await paged(q, { offset, values });
@@ -123,50 +143,50 @@ async function getCategory(title) {
   return result.rows;
 }
 
-async function getCategoryById(id){
+async function getCategoryById(id) {
 
-    const q = `
+  const q = `
         SELECT * FROM
         categories
         WHERE id = $1
     `;
-    const result = await query(q, [id]);
+  const result = await query(q, [id]);
 
-    return result.rows;
+  return result.rows;
 }
 
 async function newCategory(title) {
-    const q = `
+  const q = `
         INSERT INTO
         categories (title)
         VALUES ($1) RETURNING *
     `;
 
-    const result = await query(q, [xss(title)]);
+  const result = await query(q, [xss(title)]);
 
-    return result.rows[0];
+  return result.rows[0];
 }
 
 async function categoryInProducts(title) {
-    const q = `
+  const q = `
         SELECT * FROM
         products
         WHERE category = $1
     `;
 
-    const result = await query(q, [title]);
-    return result.rows;
+  const result = await query(q, [title]);
+  return result.rows;
 }
 
 async function updateCategory(id, title) {
-    const fields = ['title'];
-    const values = [title];
-    const result = await conditionalUpdate('categories', id, fields, values);
+  const fields = ['title'];
+  const values = [title];
+  const result = await conditionalUpdate('categories', id, fields, values);
 
-    if (!result) {
-        return null;
-    }
-    return result.rows[0];
+  if (!result) {
+    return null;
+  }
+  return result.rows[0];
 }
 
 module.exports = {
