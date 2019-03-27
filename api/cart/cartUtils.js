@@ -55,6 +55,12 @@ async function getCartLine(userid, lineid) {
 
   const newLineId = await getLineId(temp.id, lineid);
 
+  if (!newLineId) {
+    return {
+      error: 'No line in your cart with that id'
+    };
+  }
+
   const q = `
     SELECT *
     FROM incart
@@ -76,8 +82,12 @@ async function getLineId(cartid, line) {
         WHERE cartid = $1
     `;
   const lNums = await query(q, [cartid]);
-
-  const newCartId = lNums.rows[line - 1].id;
+  let newCartId;
+  try {
+    newCartId = lNums.rows[line - 1].id;
+  } catch (undefined) {
+    return null;
+  }
 
   return newCartId;
 }
@@ -276,7 +286,6 @@ async function getOrdersAdmin() {
 }
 
 async function getOrders(userId, isAdmin, offset) {
-
   let orders;
 
   if (isAdmin) {
@@ -303,7 +312,7 @@ async function getOrder(id) {
   const order = result.rows[0];
 
   order.products = result2;
-  
+
   return order;
 }
 
@@ -338,5 +347,5 @@ module.exports = {
   getOrders,
   getOrder,
   makeOrder,
-  getCartLine,
+  getCartLine
 };

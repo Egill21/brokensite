@@ -9,6 +9,7 @@ const { uploadImage } = require('./cloud');
 
 const connectionString = process.env.DATABASE_URL;
 const numOfCategories = 12;
+const numOfProducts = 1001;
 
 const readFileAsync = util.promisify(fs.readFile);
 
@@ -69,26 +70,20 @@ async function insertCategories() {
   }
 }
 
-async function testProducts() {
-  const title = faker.commerce.productName();
-  const price = faker.commerce.price();
-  const descr = faker.lorem.paragraphs();
-  const imgPath = './img/img1.jpg';
-  const cloudPath = await uploadImage(imgPath);
-  const category = faker.commerce.department();
-
-  const q2 = `
-  INSERT INTO 
-  products (title, price, descr, img, category)
-  VALUES ($1, $2, $3, $4, $5)
-`;
-
-  await query(q2, [title, price, descr, cloudPath, category]);
+async function uploadImages() {
+  const fylki = [];
+  for (let i = 1; i < 21; i++) {
+    const imgPath = './img/img' + String(i) + '.jpg';
+    const cloudPath = await uploadImage(imgPath);
+    fylki.push(cloudPath);
+  }
+  return fylki;
 }
 
 async function insertProducts() {
   let title = '';
-  for (let i = 0; i < 100; i++) {
+  const cloudPaths = await uploadImages();
+  for (let i = 0; i < numOfProducts; i++) {
     let result = { rowCount: 1 };
     while (result.rowCount > 0) {
       title = faker.commerce.productName();
@@ -102,9 +97,7 @@ async function insertProducts() {
 
     const price = faker.commerce.price();
     const descr = faker.lorem.paragraphs();
-    const imgID = Math.floor(Math.random() * 20) + 1;
-    const imgPath = './img/img' + String(imgID) + '.jpg';
-    const cloudPath = await uploadImage(imgPath);
+    const imgID = Math.floor(Math.random() * 20);
 
     const randomCategory = Math.floor(Math.random() * numOfCategories) + 1;
     const q2 = 'SELECT title FROM categories WHERE id = $1';
@@ -117,7 +110,7 @@ async function insertProducts() {
       VALUES ($1, $2, $3, $4, $5)
     `;
 
-    await query(q3, [title, price, descr, cloudPath, category]);
+    await query(q3, [title, price, descr, cloudPaths[imgID], category]);
   }
 }
 
