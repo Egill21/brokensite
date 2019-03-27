@@ -34,8 +34,8 @@ If desired, it is possible to set up the project locally by cloning this reposit
 
 ### Run online
 
-TODOO
-Heroku link here
+[Heroku link](http://hop1-2019.herokuapp.com).
+
 
 ### Web API routes and examples
 
@@ -50,35 +50,35 @@ Heroku link here
   * `GET` returns user, only if user is admin
   * `PATCH` changes user, only if user is admin
     ```json
-    > {
-    >   "admin": true 
-    > }
+    {
+      "admin": true 
+    }
     ```
 * `/users/register`
   * `POST` comfirms and creates user. returns authentication token and email. User is not admin by default
     ```json
-    > {
-    >   "username": "john123",
-    >   "email": "john@john.com",
-    >   "password": "123456" 
-    > }
+    {
+      "username": "john123",
+      "email": "john@john.com",
+      "password": "123456" 
+    }
     ```
 * `/users/login`
   * `POST` with email and password returns token if data is correct
     ```json
-    > {
-    >   "email": "john@john.com",
-    >   "password": "123456"
-    > }
+    {
+      "email": "john@john.com",
+      "password": "123456"
+    }
     ```
 * `/users/me`
   * `GET` returns user information about the owner of the token, authentication and email, only if user is logged in
   * `PATCH` updates email, password or both if data is correct, only if user is logged in
     ```json
-    > {
-    >   "email": "john2@john.com",
-    >   "password": "654321" 
-    > }
+    {
+      "email": "john2@john.com",
+      "password": "654321" 
+    }
     ```
 ### Products
 
@@ -86,13 +86,13 @@ Heroku link here
   * `GET` returns a page of products, most recently added first
   * `POST` creates new product if valid only if user is admin
     ```json
-    > {
-    >   "title": "Intelligent Wooden Pizza",
-    >   "price": 370,
-    >   "descr": "Ad quia aut et et. Dolorem aut suscipit temporibus. Veniam ut et eos est.",
-    >   "img": (link to photo) [optional],
-    >   "category": "Toys",
-    > }
+    {
+      "title": "Intelligent Wooden Pizza",
+      "price": 370,
+      "descr": "Ad quia aut et et. Dolorem aut suscipit temporibus. Veniam ut et eos est.",
+      "img": (link to photo) [optional],
+      "category": "Toys",
+    }
     ```
 * `/products?category={category}`
   * `GET` returns a page og products in the category, most recently added first
@@ -102,25 +102,25 @@ Heroku link here
   * `GET` returns product
   * `PATCH` updates product, only if user is admin
     ```json
-    > {
-    >   "title": "Tasty Soft Cheese"
-    > }
+    {
+      "title": "Tasty Soft Cheese"
+    }
     ```
   * `DELETE` deletes product, only if user is admin
 * `/categories`
   * `GET` returns page of categories
   * `POST` creates category if valid and returns it, only if user is admin
     ```json
-    > {
-    >   "title": "Toys"
-    > }
+    {
+      "title": "Toys"
+    }
     ```
 * `/categories/:id`
   * `PATCH` updates category, only if user is admin
     ```json
-    > {
-    >   "title": "Tools"
-    > }
+    {
+      "title": "Tools"
+    }
     ```
   * `DELETE` deletes category, only if user is admin
 
@@ -130,28 +130,28 @@ Heroku link here
   * `GET` returns the users cart and its content and total price, only if user is logged in
   * `POST` adds product to cart, amount and product id are required, only if user is logged in
     ```json
-    > {
-    >   "productId": "Tools",
-    >   "amount": 2
-    > }
+    {
+      "productId": "Tools",
+      "amount": 2
+    }
     ```
 * `/cart/line/:id`
   * `GET` returns line in cart including amount and information about product, only if user is logged in
   * `PATCH` updated the amount in a line in the users cart, only if user if logged in
     ```json
-    > {
-    >   "amount": 3
-    > }
+    {
+      "amount": 3
+    }
     ```
   * `DELETE` deletes line from users cart, only if user is logged in
 * `/orders`
   * `GET` returns a page of orders, most recently added orders first, if regular user: only the users orders, if admin: all orders
   * `POST` creates order from cart with appropriate values, only if user is logged in
     ```json
-    > {
-    >   "name": "John Doe",
-        "address": "7478 Mayflower St."
-    > }
+    {
+      "name": "John Doe",
+      "address": "7478 Mayflower St."
+    }
     ```
 * `/orders/:id`
   * `GET` returns the order with all lines, the orders values and total price of order, only if user is logged in or if user is admin
