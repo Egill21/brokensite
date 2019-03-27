@@ -7,12 +7,9 @@ const app = express();
 app.use(express.json());
 
 const users = require('./users');
-const { validateUser } = require('./validation');
+const { validateUser, validateLogin } = require('./validation');
 
-const {
-  JWT_SECRET: jwtSecret,
-  JWT_TOKEN_LIFETIME,
-} = process.env;
+const { JWT_SECRET: jwtSecret, JWT_TOKEN_LIFETIME } = process.env;
 
 if (!jwtSecret) {
   console.error('JWT_SECRET not registered in .env');
@@ -20,15 +17,16 @@ if (!jwtSecret) {
 }
 
 // let tokenLifetime = 60 * 60 * 24 * 31; // mánuður
-let tokenLifetime = 120*120;
+let tokenLifetime = 120 * 120;
 
 if (JWT_TOKEN_LIFETIME) {
+  console.log(Number(JWT_TOKEN_LIFETIME));
   tokenLifetime = Number(JWT_TOKEN_LIFETIME);
 }
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: jwtSecret,
+  secretOrKey: jwtSecret
 };
 
 async function strat(data, next) {
@@ -46,52 +44,48 @@ passport.use(new Strategy(jwtOptions, strat));
 app.use(passport.initialize());
 
 function requireAuth(req, res, next) {
-  return passport.authenticate(
-    'jwt',
-    { session: false },
-    (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
+  return passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
 
-      if (!user) {
-        const error = info && info.name === 'TokenExpiredError' ?
-          'expired token' : 'invalid token';
+    if (!user) {
+      const error =
+        info && info.name === 'TokenExpiredError'
+          ? 'expired token'
+          : 'invalid token';
 
-        return res.status(401).json({ error });
-      }
-      delete user.password;
-      req.user = user;
-      return next();
-    },
-  )(req, res, next);
+      return res.status(401).json({ error });
+    }
+    delete user.password;
+    req.user = user;
+    return next();
+  })(req, res, next);
 }
 
 function requireAdminAuth(req, res, next) {
-  return passport.authenticate(
-    'jwt',
-    { session: false },
-    (err, user, info) => {
-      if (err) {
-        return next(err);
-      }
+  return passport.authenticate('jwt', { session: false }, (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
 
-      if (!user) {
-        const error = info && info.name === 'TokenExpiredError' ?
-          'expired token' : 'invalid token';
+    if (!user) {
+      const error =
+        info && info.name === 'TokenExpiredError'
+          ? 'expired token'
+          : 'invalid token';
 
-        return res.status(401).json({ error });
-      }
+      return res.status(401).json({ error });
+    }
 
-      if (!user.admin) {
-        const error = 'invalid token';
-        return res.status(401).json({ error });
-      }
-      delete user.password;
-      req.user = user;
-      return next();
-    },
-  )(req, res, next);
+    if (!user.admin) {
+      const error = 'invalid token';
+      return res.status(401).json({ error });
+    }
+    delete user.password;
+    req.user = user;
+    return next();
+  })(req, res, next);
 }
 
 async function registerRoute(req, res) {
@@ -113,13 +107,22 @@ async function registerRoute(req, res) {
 async function loginRoute(req, res) {
   const { email, password } = req.body;
 
+  const validationMessages = validateLogin(email, password);
+
+  if (validationMessages.length > 0) {
+    return res.status(400).json({ errors: validationMessages });
+  }
+
   const user = await users.findByEmail(email);
 
   if (!user) {
     return res.status(401).json({ error: 'No such user' });
   }
 
-  const passwordIsCorrect = await users.comparePasswords(password, user.password);
+  const passwordIsCorrect = await users.comparePasswords(
+    password,
+    user.password
+  );
 
   if (passwordIsCorrect) {
     const payload = { id: user.id };
@@ -131,7 +134,7 @@ async function loginRoute(req, res) {
     return res.json({
       user,
       token,
-      expiresIn: tokenLifetime,
+      expiresIn: tokenLifetime
     });
   }
 
