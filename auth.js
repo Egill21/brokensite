@@ -60,7 +60,7 @@ function requireAuth(req, res, next) {
 
         return res.status(401).json({ error });
       }
-
+      delete user.password;
       req.user = user;
       return next();
     },
@@ -87,7 +87,7 @@ function requireAdminAuth(req, res, next) {
         const error = 'invalid token';
         return res.status(401).json({ error });
       }
-
+      delete user.password;
       req.user = user;
       return next();
     },
