@@ -34,10 +34,10 @@ async function validateUser({ username, password, email }, patch = false) {
   }
 
   if (!patch || password || isEmpty(password)) {
-    if (typeof password !== 'string' || password.length < 6) {
+    if (typeof password !== 'string' || password.length < 8) {
       validationMessages.push({
         field: 'password',
-        message: 'Password must be at least six letters'
+        message: 'Password must be at least eight letters'
       });
     }
   }
