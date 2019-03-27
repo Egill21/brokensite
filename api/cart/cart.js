@@ -18,7 +18,7 @@ const {
 
 async function cartRoute(req, res) {
   const { id } = req.user;
-  const cart = await getCart(id);
+  const cart = await getCart(id, false);
   return res.json(cart);
 }
 
@@ -121,13 +121,19 @@ async function orderRoute(req, res) {
     return res.status(404).json({ error: 'Id entry not found' });
   }
 
+  
+  const order = await getOrder(id);
+  
+  if (!order) {
+    res.status(404).json({ error: 'Order not found' });
+  }
   const { user } = req;
 
-  const order = getOrder(id, user);
+  if (!user.admin && user.id !== order.userid) {
+    res.status(401).json({ error: 'You are not authorized to access this order' });
+  }
   
-  return res.json({
-    gamli: 'nettti'
-  });
+  return res.json(order);
 }
 
 module.exports = {
