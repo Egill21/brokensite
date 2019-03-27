@@ -1,9 +1,9 @@
 # Hópverkefni 1
 
 ## Authors
-Ásdís Erla Jóhannsdóttir
-Egill Ragnarsson
-Flóki Þorleifsson
+Ásdís Erla Jóhannsdóttir <br />
+Egill Ragnarsson <br />
+Flóki Þorleifsson <br />
 
 ## SETUP
 
@@ -147,6 +147,12 @@ Heroku link here
 * `/orders`
   * `GET` returns a page of orders, most recently added orders first, if regular user: only the users orders, if admin: all orders
   * `POST` creates order from cart with appropriate values, only if user is logged in
+    ```json
+    > {
+    >   "name": "John Doe",
+        "address": "7478 Mayflower St."
+    > }
+    ```
 * `/orders/:id`
   * `GET` returns the order with all lines, the orders values and total price of order, only if user is logged in or if user is admin
 
