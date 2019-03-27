@@ -36,6 +36,13 @@ If desired, it is possible to set up the project locally by cloning this reposit
 
 [Heroku link](http://hop1-2019.herokuapp.com).
 
+You can log in as admin by using the **POST** method on the following to the path */users/login*
+```json
+    {
+      "email": "admin@admin.is",
+      "password": "12345678" 
+    }
+```
 
 ### Web API routes and examples
 
