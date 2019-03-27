@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const { query, conditionalUpdate } = require('./db');
 const xss = require('xss');
+const { query, conditionalUpdate } = require('./db');
 
 async function comparePasswords(password, hash) {
   const result = await bcrypt.compare(password, hash);

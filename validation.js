@@ -1,9 +1,9 @@
-const users = require('./users');
 const validator = require('validator');
+const users = require('./users');
 const {
   getProductByTitle,
   getProductById,
-  getCategory
+  getCategory,
 } = require('./api/products/productsUtils');
 
 const isEmpty = s => s != null && !s;
@@ -11,14 +11,12 @@ const isEmpty = s => s != null && !s;
 async function validateUser({ username, password, email }, patch = false) {
   const validationMessages = [];
 
-  // can't patch username
   if (!patch) {
-    const m =
-      'Username is required, must be at least three letters and no more than 32 characters';
+    const m = 'Username is required, must be at least three letters and no more than 32 characters';
     if (
-      typeof username !== 'string' ||
-      username.length < 3 ||
-      username.length > 32
+      typeof username !== 'string'
+      || username.length < 3
+      || username.length > 32
     ) {
       validationMessages.push({ field: 'username', message: m });
     }
@@ -28,7 +26,7 @@ async function validateUser({ username, password, email }, patch = false) {
     if (user) {
       validationMessages.push({
         field: 'username',
-        message: 'Username is already registered'
+        message: 'Username is already registered',
       });
     }
   }
@@ -37,7 +35,7 @@ async function validateUser({ username, password, email }, patch = false) {
     if (typeof password !== 'string' || password.length < 8) {
       validationMessages.push({
         field: 'password',
-        message: 'Password must be at least eight letters'
+        message: 'Password must be at least eight letters',
       });
     }
   }
@@ -46,7 +44,7 @@ async function validateUser({ username, password, email }, patch = false) {
     if (typeof email !== 'string' || !validator.isEmail(String(email))) {
       validationMessages.push({
         field: 'email',
-        message: 'Email is not valid.'
+        message: 'Email is not valid.',
       });
     }
   }
@@ -56,7 +54,7 @@ async function validateUser({ username, password, email }, patch = false) {
   if (userEmail) {
     validationMessages.push({
       field: 'email',
-      message: 'Email is already registered'
+      message: 'Email is already registered',
     });
   }
 
@@ -68,20 +66,21 @@ async function validateAdmin(admin) {
   if (typeof admin !== 'boolean') {
     validationMessage.push({
       field: 'admin',
-      message: 'admin must be a boolean value'
+      message: 'admin must be a boolean value',
     });
   }
   return validationMessage;
 }
 
 async function validateProduct(
-  { title, price, descr, category },
-  patch = false
+  {
+    title, price, descr, category,
+  },
+  patch = false,
 ) {
   const validationMessages = [];
 
-  const m =
-    'Title is required, must be at least one letter and no more than 128 characters';
+  const m = 'Title is required, must be at least one letter and no more than 128 characters';
   if (!patch || title || isEmpty(title)) {
     if (typeof title !== 'string' || title.length < 1 || title.length > 128) {
       validationMessages.push({ field: 'title', message: m });
@@ -90,20 +89,22 @@ async function validateProduct(
     if (product.length !== 0) {
       validationMessages.push({
         field: 'title',
-        message: 'Title already exists'
+        message: 'Title already exists',
       });
     }
   }
 
-  if (!patch || price || isEmpty(price)) {
+  if (!patch
+    || price
+    || isEmpty(price)) {
     if (
-      typeof price !== 'number' ||
-      price.length < 1 ||
-      !validator.matches(String(price), /^\d+(.\d{1,2})?$/)
+      typeof price !== 'number'
+      || price.length < 1
+      || !validator.matches(String(price), /^\d+(.\d{1,2})?$/)
     ) {
       validationMessages.push({
         field: 'price',
-        message: 'Price must be a valid currency amount'
+        message: 'Price must be a valid currency amount',
       });
     }
   }
@@ -112,20 +113,22 @@ async function validateProduct(
     if (typeof descr !== 'string' || descr.length <= 0 || descr.length > 1500) {
       validationMessages.push({
         field: 'descr',
-        message: 'Description must be a string of minimum 1 and maximum 1500.'
+        message: 'Description must be a string of minimum 1 and maximum 1500.',
       });
     }
   }
 
-  if (!patch || category || isEmpty(category)) {
+  if (!patch
+    || category
+    || isEmpty(category)) {
     if (
-      typeof category !== 'string' ||
-      category.length <= 0 ||
-      category.length > 128
+      typeof category !== 'string'
+      || category.length <= 0
+      || category.length > 128
     ) {
       validationMessages.push({
         field: 'category',
-        message: 'Category must be a string of minimum 1 and maximum 128.'
+        message: 'Category must be a string of minimum 1 and maximum 128.',
       });
     }
   }
@@ -135,7 +138,7 @@ async function validateProduct(
     if (cat.length === 0) {
       validationMessages.push({
         field: 'category',
-        message: 'Category does not exist'
+        message: 'Category does not exist',
       });
     }
   }
@@ -150,7 +153,7 @@ async function validateCategory(title) {
       validationMessage.push({
         field: 'category',
         message:
-          'Category must be a string of length at least 1 and maximum 128.'
+          'Category must be a string of length at least 1 and maximum 128.',
       });
     }
   }
@@ -164,14 +167,14 @@ async function validateCartPost(productId, amount) {
     if (typeof productId !== 'number') {
       validationMessages.push({
         field: 'productid',
-        message: 'Product must be a number'
+        message: 'Product must be a number',
       });
     } else {
       const product = await getProductById(productId);
       if (!product) {
         validationMessages.push({
           field: 'productid',
-          message: 'Product does not exist'
+          message: 'Product does not exist',
         });
       }
     }
@@ -179,7 +182,7 @@ async function validateCartPost(productId, amount) {
   if (isEmpty(amount) || typeof amount !== 'number' || amount < 1) {
     validationMessages.push({
       field: 'amount',
-      message: 'Amount is required and has to be a number greater than 0'
+      message: 'Amount is required and has to be a number greater than 0',
     });
   }
 
@@ -192,7 +195,7 @@ async function validateCartPatch(amount) {
   if (isEmpty(amount) || typeof amount !== 'number') {
     validationMessages.push({
       field: 'amount',
-      message: 'Amount be a number greater than 0'
+      message: 'Amount be a number greater than 0',
     });
   }
   return validationMessages;
@@ -204,7 +207,7 @@ async function validateId(id) {
   if (!Number.isInteger(Number(id))) {
     validationMessages.push({
       field: 'id',
-      message: 'ID must be a number greater than or equal to 0'
+      message: 'ID must be a number greater than or equal to 0',
     });
   }
   return validationMessages;
