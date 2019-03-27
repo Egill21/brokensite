@@ -49,7 +49,7 @@ async function findByEmail(email) {
 
 async function createUser(username, password, email) {
   const hashedPassword = await bcrypt.hash(password, 11);
-
+  console.log(hashedPassword);
   const q = `
     INSERT INTO
       users (username, password, email)

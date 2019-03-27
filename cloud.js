@@ -30,7 +30,7 @@ async function uploadImage(path) {
     }
     console.error('Unable to upload file to cloudinary:', path);
     console.error(error);
-    return { error: 'blabla' };
+    return { error: 'Error uploading image' };
   }
   return upload.secure_url;
 }
