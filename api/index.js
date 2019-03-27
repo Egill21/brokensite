@@ -76,23 +76,11 @@ router.get('/products', catchErrors(productsRoute));
 router.post('/products', requireAdminAuth, catchErrors(newProductRoute));
 router.get('/products/:id', catchErrors(productRoute));
 router.patch('/products/:id', requireAdminAuth, catchErrors(productPatchRoute));
-router.delete(
-  '/products/:id',
-  requireAdminAuth,
-  catchErrors(productDeleteRoute)
-);
+router.delete('/products/:id', requireAdminAuth, catchErrors(productDeleteRoute));
 router.get('/categories', catchErrors(categoriesRoute));
 router.post('/categories', requireAdminAuth, catchErrors(categoriesPostRoute));
-router.patch(
-  '/categories/:id',
-  requireAdminAuth,
-  catchErrors(categoryPatchRoute)
-);
-router.delete(
-  '/categories/:id',
-  requireAdminAuth,
-  catchErrors(categoryDeleteRoute)
-);
+router.patch('/categories/:id', requireAdminAuth, catchErrors(categoryPatchRoute));
+router.delete('/categories/:id', requireAdminAuth, catchErrors(categoryDeleteRoute));
 
 router.post('/cart', requireAuth, catchErrors(cartPostRoute));
 router.get('/cart', requireAuth, catchErrors(cartRoute));
