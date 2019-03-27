@@ -198,11 +198,43 @@ async function validateCartPatch(amount) {
   return validationMessages;
 }
 
+async function validateId(id) {
+  const validationMessages = [];
+
+  if (!Number.isInteger(Number(id))) {
+    validationMessages.push({
+      field: 'id',
+      message: 'ID must be a number greater than or equal to 0'
+    });
+  }
+  return validationMessages;
+}
+
+function validateOrderPost(name, address) {
+  const validationMessages = [];
+
+  if (isEmpty(name) || typeof name !== 'string') {
+    validationMessages.push({
+      field: 'name',
+      message: 'Name is required and must be a string of length at least 1',
+    });
+  }
+  if (isEmpty(address) || typeof address !== 'string') {
+    validationMessages.push({
+      field: 'address',
+      message: 'Address is required and must be a string of length at least 1',
+    });
+  }
+  return validationMessages;
+}
+
 module.exports = {
   validateUser,
   validateAdmin,
   validateProduct,
   validateCategory,
   validateCartPost,
-  validateCartPatch
+  validateCartPatch,
+  validateId,
+  validateOrderPost,
 };

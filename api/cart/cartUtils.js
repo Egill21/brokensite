@@ -3,8 +3,13 @@ const { getProductById } = require('../products/productsUtils');
 const xss = require('xss');
 
 // Nota með cartRoute() í cart.js
-async function getCart(userId) {
-  const temp = await isCart(userId);
+async function getCart(userId, order) {
+  let temp;
+  if (!order) {
+    temp = await isCart(userId);
+  } else {
+    temp = await getOrderByID(userId);
+  }
 
   if (!temp.available) {
     return {
@@ -44,7 +49,7 @@ async function getCartLine(userid, lineid) {
 
   if (!temp.available) {
     return {
-      message: temp.error
+      error: temp.error
     };
   }
 
@@ -164,7 +169,7 @@ async function deleteCartItem(userid, id) {
 
   await deleteCartIfEmpty(userid, cartid.id);
 
-  const cart = await getCart(userid);
+  const cart = await getCart(userid, false);
 
   return cart;
 }
@@ -183,6 +188,27 @@ async function isCart(userid) {
     isorder = '0'`;
 
   const result = await query(check, [userid]);
+
+  if (result.rows.length === 0) {
+    return {
+      available: false,
+      error: 'You dont have anything in your cart'
+    };
+  }
+
+  return {
+    id: result.rows[0].id,
+    available: true
+  };
+}
+
+async function getOrderByID(id) {
+  const check = `
+    SELECT * FROM
+    carts 
+    WHERE id = $1`;
+
+  const result = await query(check, [id]);
 
   if (result.rows.length === 0) {
     return {
@@ -262,22 +288,43 @@ async function getOrders(userId, isAdmin, offset) {
   return orders;
 }
 
-async function makeOrder(bit, id) {
-  const cart = await getCart(id);
-  const notbit = '0';
+async function getOrder(id) {
+  const q = `
+    SELECT * FROM
+    carts
+    WHERE isorder = '1'
+    AND id = $1
+  `;
+  const result = await query(q, [id]);
+  if (result.rows.length === 0) {
+    return null;
+  }
+  const result2 = await getCart(id, true);
+  const order = result.rows[0];
+
+  order.products = result2;
+  
+  return order;
+}
+
+async function makeOrder(name, address, id) {
+  const cart = await getCart(id, false);
+
   if (cart.error) {
     return null;
   }
   const currentDate = new Date();
   const q = `
     UPDATE carts
-    SET isorder = $1
-    ,created = $2
-    WHERE isorder = $3
+    SET isorder = '1',
+    name = $1,
+    address = $2,
+    created = $3
+    WHERE isorder = '0'
     AND userid = $4
     RETURNING *
   `;
-  const values = [bit, currentDate, notbit, id];
+  const values = [xss(name), xss(address), currentDate, id];
 
   const result = await query(q, values);
   return cart;
@@ -289,6 +336,7 @@ module.exports = {
   changeAmount,
   deleteCartItem,
   getOrders,
+  getOrder,
   makeOrder,
   getCartLine,
 };
