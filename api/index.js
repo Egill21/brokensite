@@ -30,6 +30,7 @@ const {
   cartItemDelete,
   ordersRoute,
   ordersPostRoute,
+  orderRoute,
   cartLineRoute
 } = require('./cart/cart');
 
@@ -101,5 +102,6 @@ router.get('/cart/line/:id', requireAuth, catchErrors(cartLineRoute));
 
 router.get('/orders', requireAuth, catchErrors(ordersRoute));
 router.post('/orders', requireAuth, catchErrors(ordersPostRoute));
+router.get('/orders/:id', requireAuth, catchErrors(orderRoute));
 
 module.exports = router;

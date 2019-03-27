@@ -262,22 +262,37 @@ async function getOrders(userId, isAdmin, offset) {
   return orders;
 }
 
-async function makeOrder(bit, id) {
+async function getOrder(id, user) {
+  const q = `
+    SELECT * FROM
+    carts
+    WHERE isorder = '1'
+    AND id = $1
+  `;
+  const result = await query(q, [id]);
+  const order = result.rows[0];
+  console.log(order);
+  return null;
+}
+
+async function makeOrder(name, address, id) {
   const cart = await getCart(id);
-  const notbit = '0';
+
   if (cart.error) {
     return null;
   }
   const currentDate = new Date();
   const q = `
     UPDATE carts
-    SET isorder = $1
-    ,created = $2
-    WHERE isorder = $3
+    SET isorder = '1',
+    name = $1,
+    address = $2,
+    created = $3
+    WHERE isorder = '0'
     AND userid = $4
     RETURNING *
   `;
-  const values = [bit, currentDate, notbit, id];
+  const values = [xss(name), xss(address), currentDate, id];
 
   const result = await query(q, values);
   return cart;
@@ -289,6 +304,7 @@ module.exports = {
   changeAmount,
   deleteCartItem,
   getOrders,
+  getOrder,
   makeOrder,
   getCartLine,
 };

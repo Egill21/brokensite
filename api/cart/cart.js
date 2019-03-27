@@ -4,6 +4,7 @@ const {
   changeAmount,
   deleteCartItem,
   getOrders,
+  getOrder,
   makeOrder,
   getCartLine
 } = require('./cartUtils');
@@ -11,7 +12,8 @@ const { getProductById } = require('../products/productsUtils');
 const {
   validateCartPost,
   validateCartPatch,
-  validateId
+  validateId,
+  validateOrderPost,
 } = require('../../validation');
 
 async function cartRoute(req, res) {
@@ -96,26 +98,36 @@ async function ordersRoute(req, res) {
 
 async function ordersPostRoute(req, res) {
   const { id } = req.user;
-  const { order } = req.body;
+  const { name, address } = req.body;
 
-  const changeToOrder = order === true ? '1' : '0';
-
-  if (changeToOrder !== '1') {
-    return res.status(400).json({
-      error: {
-        field: 'order',
-        message: `To create order, order must be equal to 'true'`,
-      }
-    });
+  const validationMessage = validateOrderPost(name, address);
+  if (validationMessage.length > 0) {
+    return res.status(400).json({ errors: validationMessage });
   }
 
-  const result = await makeOrder(changeToOrder, id);
+  const result = await makeOrder(name, address, id);
 
   if (!result) {
     const message = 'You dont have anything in your cart';
     return res.status(404).json({ error: message });
   }
   return res.json(result);
+}
+
+async function orderRoute(req, res) {
+  const { id } = req.params;
+
+  if (!Number.isInteger(Number(id))) {
+    return res.status(404).json({ error: 'Id entry not found' });
+  }
+
+  const { user } = req;
+
+  const order = getOrder(id, user);
+  
+  return res.json({
+    gamli: 'nettti'
+  });
 }
 
 module.exports = {
@@ -125,5 +137,6 @@ module.exports = {
   cartItemDelete,
   ordersRoute,
   ordersPostRoute,
+  orderRoute,
   cartLineRoute
 };
