@@ -16,17 +16,15 @@ if (!jwtSecret) {
   process.exit(1);
 }
 
-// let tokenLifetime = 60 * 60 * 24 * 31; // mánuður
 let tokenLifetime = 120 * 120;
 
 if (JWT_TOKEN_LIFETIME) {
-  console.log(Number(JWT_TOKEN_LIFETIME));
   tokenLifetime = Number(JWT_TOKEN_LIFETIME);
 }
 
 const jwtOptions = {
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-  secretOrKey: jwtSecret
+  secretOrKey: jwtSecret,
 };
 
 async function strat(data, next) {
@@ -50,14 +48,13 @@ function requireAuth(req, res, next) {
     }
 
     if (!user) {
-      const error =
-        info && info.name === 'TokenExpiredError'
-          ? 'expired token'
-          : 'invalid token';
+      const error = info && info.name === 'TokenExpiredError'
+        ? 'expired token'
+        : 'invalid token';
 
       return res.status(401).json({ error });
     }
-    delete user.password;
+    delete user.password; // eslint-disable-line
     req.user = user;
     return next();
   })(req, res, next);
@@ -70,10 +67,9 @@ function requireAdminAuth(req, res, next) {
     }
 
     if (!user) {
-      const error =
-        info && info.name === 'TokenExpiredError'
-          ? 'expired token'
-          : 'invalid token';
+      const error = info && info.name === 'TokenExpiredError'
+        ? 'expired token'
+        : 'invalid token';
 
       return res.status(401).json({ error });
     }
@@ -82,7 +78,7 @@ function requireAdminAuth(req, res, next) {
       const error = 'invalid token';
       return res.status(401).json({ error });
     }
-    delete user.password;
+    delete user.password; // eslint-disable-line
     req.user = user;
     return next();
   })(req, res, next);
@@ -121,7 +117,7 @@ async function loginRoute(req, res) {
 
   const passwordIsCorrect = await users.comparePasswords(
     password,
-    user.password
+    user.password,
   );
 
   if (passwordIsCorrect) {
@@ -134,7 +130,7 @@ async function loginRoute(req, res) {
     return res.json({
       user,
       token,
-      expiresIn: tokenLifetime
+      expiresIn: tokenLifetime,
     });
   }
 

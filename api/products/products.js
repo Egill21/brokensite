@@ -8,7 +8,7 @@ const {
   getCategoryById,
   newCategory,
   categoryInProducts,
-  updateCategory,
+  updateCategory
 } = require('./productsUtils');
 
 const { validateProduct, validateCategory } = require('../../validation');
@@ -130,7 +130,6 @@ async function productDeleteRoute(req, res) {
     return res.status(404).json({ error: 'Product not found' });
   }
 
-
   const del = await query('DELETE FROM products WHERE id = $1', [id]);
 
   if (del.rowCount === 1) {
@@ -235,5 +234,5 @@ module.exports = {
   categoriesRoute,
   categoriesPostRoute,
   categoryPatchRoute,
-  categoryDeleteRoute,
+  categoryDeleteRoute
 };
