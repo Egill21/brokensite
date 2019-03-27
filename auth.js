@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 
 const users = require('./users');
-const { validateUser } = require('./validation');
+const { validateUser, validateLogin } = require('./validation');
 
 const { JWT_SECRET: jwtSecret, JWT_TOKEN_LIFETIME } = process.env;
 
@@ -106,6 +106,12 @@ async function registerRoute(req, res) {
 
 async function loginRoute(req, res) {
   const { email, password } = req.body;
+
+  const validationMessages = validateLogin(email, password);
+
+  if (validationMessages.length > 0) {
+    return res.status(400).json({ errors: validationMessages });
+  }
 
   const user = await users.findByEmail(email);
 

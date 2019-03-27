@@ -97,7 +97,7 @@ async function validateProduct(
 
   if (!patch || price || isEmpty(price)) {
     if (
-      typeof price !== 'string' ||
+      typeof price !== 'number' ||
       price.length < 1 ||
       !validator.matches(String(price), /^\d+(.\d{1,2})?$/)
     ) {
@@ -228,6 +228,25 @@ function validateOrderPost(name, address) {
   return validationMessages;
 }
 
+function validateLogin(email, password) {
+  const validationMessages = [];
+
+  if (isEmpty(email) || typeof email !== 'string') {
+    validationMessages.push({
+      field: 'email',
+      message: 'Email is required and must be a string',
+    });
+  }
+
+  if (isEmpty(password) || typeof password !== 'string') {
+    validationMessages.push({
+      field: 'password',
+      message: 'Password is required and must be a string',
+    });
+  }
+  return validationMessages;
+}
+
 module.exports = {
   validateUser,
   validateAdmin,
@@ -237,4 +256,5 @@ module.exports = {
   validateCartPatch,
   validateId,
   validateOrderPost,
+  validateLogin,
 };
