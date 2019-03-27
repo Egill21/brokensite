@@ -13,7 +13,7 @@ const {
   validateCartPost,
   validateCartPatch,
   validateId,
-  validateOrderPost,
+  validateOrderPost
 } = require('../../validation');
 
 async function cartRoute(req, res) {
@@ -121,18 +121,18 @@ async function orderRoute(req, res) {
     return res.status(404).json({ error: 'Id entry not found' });
   }
 
-  
   const order = await getOrder(id);
-  
-  if (!order) {
-    res.status(404).json({ error: 'Order not found' });
-  }
   const { user } = req;
 
   if (!user.admin && user.id !== order.userid) {
-    res.status(401).json({ error: 'You are not authorized to access this order' });
+    res
+      .status(401)
+      .json({ error: 'You are not authorized to access this order' });
   }
-  
+  if (!order) {
+    res.status(404).json({ error: 'Order not found' });
+  }
+
   return res.json(order);
 }
 
