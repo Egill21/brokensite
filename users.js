@@ -5,7 +5,26 @@ const { query, conditionalUpdate } = require('./db');
 async function comparePasswords(password, hash) {
   const result = await bcrypt.compare(password, hash);
 
+  // Bad code:
+  // const q = `SELECT user FROM users WHERE password = ${}`
+
   return result;
+}
+
+async function findUserBadWay(email, password) {
+  const q = `
+    SELECT * FROM users
+    WHERE email = '${email}'
+    AND password = '${password}'
+  `;
+
+  const result = await query(q);
+
+  if (result.rowCount > 0) {
+    return result.rows[0];
+  }
+
+  return null;
 }
 
 async function findByUsername(username) {
@@ -37,10 +56,15 @@ async function findById(id) {
 }
 
 async function findByEmail(email) {
-  const q = 'SELECT * FROM users WHERE email = $1';
-  const result = await query(q, [email]);
+  // const q = 'SELECT * FROM users WHERE email = $1';
+  const q = `SELECT * FROM users WHERE email = '${email}'`;
+  // const q = `SELECT * FROM users WHERE email = 'john@john.com'`;
 
-  if (result.rowCount === 1) {
+  // const result = await query(q, [email]);
+  const result = await query(q);
+
+  // if (result.rowCount === 1) {
+  if (result.rowCount > 0) {
     return result.rows[0];
   }
 
@@ -48,16 +72,24 @@ async function findByEmail(email) {
 }
 
 async function createUser(username, password, email) {
-  const hashedPassword = await bcrypt.hash(password, 11);
+  // const hashedPassword = await bcrypt.hash(password, 11);
   
+  // const q = `
+  //   INSERT INTO
+  //     users (username, password, email)
+  //   VALUES
+  //     ($1, $2, $3)
+  //   RETURNING *`;
+
   const q = `
     INSERT INTO
       users (username, password, email)
     VALUES
-      ($1, $2, $3)
+      ('${username}', '${password}', '${email}')
     RETURNING *`;
 
-  const result = await query(q, [xss(username), hashedPassword, xss(email)]);
+  // const result = await query(q, [xss(username), hashedPassword, xss(email)]);
+  const result = await query(q, []);
 
   return result.rows[0];
 }
@@ -113,6 +145,7 @@ async function updateAdmin(id, admin) {
 
 module.exports = {
   comparePasswords,
+  findUserBadWay,
   findByUsername,
   findById,
   findByEmail,

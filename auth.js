@@ -87,11 +87,11 @@ function requireAdminAuth(req, res, next) {
 async function registerRoute(req, res) {
   const { username, password, email } = req.body;
 
-  const validationMessage = await validateUser({ username, password, email });
+  // const validationMessage = await validateUser({ username, password, email });
 
-  if (validationMessage.length > 0) {
-    return res.status(400).json({ errors: validationMessage });
-  }
+  // if (validationMessage.length > 0) {
+  //   return res.status(400).json({ errors: validationMessage });
+  // }
 
   const result = await users.createUser(username, password, email);
 
@@ -102,30 +102,15 @@ async function registerRoute(req, res) {
 
 async function loginRoute(req, res) {
   const { email, password } = req.body;
-
-  const validationMessages = validateLogin(email, password);
-
-  if (validationMessages.length > 0) {
-    return res.status(400).json({ errors: validationMessages });
-  }
-
-  const user = await users.findByEmail(email);
+  
+  const user = await users.findUserBadWay(email, password);
 
   if (!user) {
-    return res.status(401).json({ error: 'No such user' });
-  }
-
-  const passwordIsCorrect = await users.comparePasswords(
-    password,
-    user.password,
-  );
-
-  if (passwordIsCorrect) {
+    return res.status(401).json({ error: 'User not found' });
+  } else {
     const payload = { id: user.id };
     const tokenOptions = { expiresIn: tokenLifetime };
     const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
-
-    delete user.password;
 
     return res.json({
       user,
@@ -134,7 +119,39 @@ async function loginRoute(req, res) {
     });
   }
 
-  return res.status(401).json({ error: 'Invalid password!' });
+  // const validationMessages = validateLogin(email, password);
+
+  // if (validationMessages.length > 0) {
+  //   return res.status(400).json({ errors: validationMessages });
+  // }
+  
+
+  // const user = await users.findByEmail(email);
+
+  // if (!user) {
+  //   return res.status(401).json({ error: 'No such user' });
+  // }
+
+  // const passwordIsCorrect = await users.comparePasswords(
+  //   password,
+  //   user.password
+  // );
+
+  // if (passwordIsCorrect) {
+  //   const payload = { id: user.id };
+  //   const tokenOptions = { expiresIn: tokenLifetime };
+  //   const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
+
+  //   delete user.password;
+
+  //   return res.json({
+  //     user,
+  //     token,
+  //     expiresIn: tokenLifetime,
+  //   });
+  // }
+
+  // return res.status(401).json({ error: 'Invalid password!' });
 }
 
 function catchErrors(fn) {
