@@ -75,21 +75,31 @@ async function getProductById(id) {
 async function makeNewProduct(data) {
   const { title, price, descr, image, category } = data;
 
+  // const q = `
+  // INSERT INTO
+  // products (title, price, descr, img, category)
+  // VALUES
+  // ($1, $2, $3, $4, $5)
+  // RETURNING *
+  // `;
+
   const q = `
     INSERT INTO
     products (title, price, descr, img, category)
     VALUES
-    ($1, $2, $3, $4, $5)
+    ('${title}', ${price}, '${descr}', '${image}', '${category}')
     RETURNING *
-    `;
+  `;
 
-  const result = await query(q, [
-    xss(title),
-    xss(price),
-    xss(descr),
-    xss(image),
-    xss(category)
-  ]);
+  // const result = await query(q, [
+  //   xss(title),
+  //   xss(price),
+  //   xss(descr),
+  //   xss(image),
+  //   xss(category)
+  // ]);
+
+  const result = await query(q);
 
   return result.rows[0];
 }

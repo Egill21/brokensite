@@ -33,16 +33,16 @@ async function newProductRoute(req, res) {
     category = ''
   } = req.body;
 
-  const validationMessage = await validateProduct({
-    title,
-    price,
-    descr,
-    category
-  });
+  // const validationMessage = await validateProduct({
+  //   title,
+  //   price,
+  //   descr,
+  //   category
+  // });
 
-  if (validationMessage.length > 0) {
-    return res.status(400).json({ errors: validationMessage });
-  }
+  // if (validationMessage.length > 0) {
+  //   return res.status(400).json({ errors: validationMessage });
+  // }
   let image = '';
   if (img !== '') {
     const imgURL = await uploadImage(img);
